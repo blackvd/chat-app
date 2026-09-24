@@ -9,6 +9,16 @@ export default function MessageForm({ roomId, socket, onSend }) {
   const [status, setStatus] = useState('');
   const sending = useRef(false);
   const generation = useRef(0);
+  const input = useRef(null);
+  const refocus = useRef(false);
+
+  useEffect(() => {
+    // Keep the composer ready for the next message once sending finishes.
+    if (!pending && refocus.current) {
+      refocus.current = false;
+      input.current?.focus();
+    }
+  }, [pending]);
 
   useEffect(() => {
     generation.current++;
@@ -46,6 +56,7 @@ export default function MessageForm({ roomId, socket, onSend }) {
       return;
     }
     sending.current = true;
+    refocus.current = document.activeElement === input.current;
     setPending(true);
     const currentGeneration = generation.current;
     socket.timeout(10000).emit('message:send', { roomId, content: message }, (err, result) => {
@@ -68,18 +79,27 @@ export default function MessageForm({ roomId, socket, onSend }) {
 
   return (
     <form className="message-form" onSubmit={handleSubmit} aria-busy={pending}>
-      <label htmlFor={`${id}-message`}>Message</label>
-      <textarea id={`${id}-message`} name="message" rows={3} required maxLength={5000}
-        value={content} disabled={pending} aria-describedby={`${id}-status`}
-        onChange={(event) => { setContent(event.target.value); setStatus(''); setError(''); }} />
-      <div id={`${id}-status`}>
+      <label className="visually-hidden" htmlFor={`${id}-message`}>Message</label>
+      <div id={`${id}-status`} className="message-form-status">
         {!connected && <p role="status">Messaging is disconnected. Reconnect or log in again to send.</p>}
         {error && <p className="login-error" role="alert">{error}</p>}
-        {status && <p role="status">{status}</p>}
+        {status && <p className="visually-hidden" role="status">{status}</p>}
       </div>
-      <button type="submit" disabled={pending || !connected || !content.trim()}>
-        {pending ? 'Sending…' : 'Send message'}
-      </button>
+      <div className="composer-row">
+        <textarea ref={input} id={`${id}-message`} name="message" rows={1} placeholder="Type a message…" required maxLength={5000}
+          value={content} disabled={pending} aria-describedby={`${id}-status`}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing && event.keyCode !== 229) {
+              event.preventDefault();
+              event.currentTarget.form.requestSubmit();
+            }
+          }}
+          onChange={(event) => { setContent(event.target.value); setStatus(''); setError(''); }} />
+        <button className="composer-send" type="submit" disabled={pending || !connected || !content.trim()}
+          aria-label={pending ? 'Sending…' : 'Send message'} title="Send message">
+          <span aria-hidden="true">{pending ? '…' : '➤'}</span>
+        </button>
+      </div>
     </form>
   );
 }

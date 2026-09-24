@@ -60,7 +60,7 @@ export default function LoginForm({ onLogin }) {
   return (
     <section className="login-card" aria-labelledby={`${id}-title`}>
       <h1 id={`${id}-title`}>Log in</h1>
-      <p>Welcome back to Chat App.</p>
+      <p>Welcome back to NouchiChat. On est ensemble 🤝</p>
       <form onSubmit={handleSubmit} aria-busy={pending}>
         <label htmlFor={`${id}-email`}>Email</label>
         <input id={`${id}-email`} name="email" type="email" autoComplete="username"

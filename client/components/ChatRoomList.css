@@ -3,7 +3,7 @@
 .room-cards { display: grid; gap: 1.25rem; margin: 1.5rem 0; }
 .room-card { min-width: 0; padding: 1.4rem; border: 1px solid var(--border); border-radius: 1rem; background: #fdfefd; overflow-wrap: anywhere; }
 .room-list-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .9rem; }
-.room-list-actions button { margin: 0; background: #edf4ef; color: var(--accent); border-color: var(--border); }
+.room-list-actions button { margin: 0; background: #edf4ef; color: var(--secondary); border-color: var(--border); }
 .room-list-actions button:hover:not(:disabled) { color: white; }
 .room-membership { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .room-membership > span { min-width: 0; font-size: 1.1rem; font-weight: 700; letter-spacing: -.02em; }
@@ -28,7 +28,7 @@
 .message-header { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .75rem; }
 .message-header strong { font-size: .82rem; }
 .message-list .chat-message-own { flex-direction: row-reverse; }
-.chat-message-own .message-bubble { background: #e1f0e8; border-color: #c9e1d4; border-radius: 1rem .2rem 1rem 1rem; }
+.chat-message-own .message-bubble { background: var(--accent-soft); border-color: var(--accent-border); border-radius: 1rem .2rem 1rem 1rem; }
 .chat-message-own .message-avatar { background: var(--accent); color: white; }
 .message-you { color: var(--accent); }
 .message-time-missing { font-size: .75rem; color: var(--muted); }
@@ -66,4 +66,9 @@
 @media (forced-colors: active) {
   .message-bubble, .message-avatar, .room-card { border: 1px solid CanvasText; }
   .online-users li::before { background: CanvasText; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .room-card { transition: border-color .18s, box-shadow .18s; }
+  .room-card:hover { border-color: #c7d8ce; box-shadow: 0 4px 16px #203b3908; }
 }

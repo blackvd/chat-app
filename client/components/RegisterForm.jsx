@@ -69,7 +69,7 @@ export default function RegisterForm({ onRegister }) {
   return (
     <section className="login-card" aria-labelledby={`${id}-title`}>
       <h1 id={`${id}-title`}>Create an account</h1>
-      <p>Join Chat App.</p>
+      <p>Join NouchiChat. A little closer, wherever you are.</p>
       <form onSubmit={handleSubmit} aria-busy={pending} aria-describedby={error ? `${id}-error` : undefined}>
         <label htmlFor={`${id}-username`}>Username</label>
         <input id={`${id}-username`} name="username" autoComplete="username"

@@ -110,14 +110,14 @@ export default function RoomMessages({ roomId, socket, currentUserId }) {
 
   return (
     <section className="room-messages" aria-label="Room messages">
-      <h2>Messages</h2>
-      <p role="status">{connected ? 'Live messages connected' : 'Live messages disconnected. History is shown below.'}</p>
-      {before && <button type="button" disabled={loading} onClick={() => loadHistory(before)}>Load older messages</button>}
+      <h2 className="visually-hidden">Messages</h2>
+      <p className={`live-status${connected ? '' : ' live-status-off'}`} role="status">{connected ? 'Live messages connected' : 'Live messages disconnected. History is shown below.'}</p>
+      {before && <button className="load-older" type="button" disabled={loading} onClick={() => loadHistory(before)}>Load older messages</button>}
       {loading && <p role="status">Loading messages…</p>}
       {error && <div><p className="login-error" role="alert">{error}</p>
         <button type="button" disabled={loading} onClick={() => setRetry((value) => value + 1)}>Reload messages</button>
       </div>}
-      {!loading && !error && messages.length === 0 && <p>No messages yet. Start the conversation!</p>}
+      {!loading && !error && messages.length === 0 && <p className="messages-empty">Ça dit quoi ? Send the first message.</p>}
       <ol ref={list} className="message-list" role="log" aria-label="Message history" aria-live="polite" tabIndex={0}
         onScroll={() => {
           const element = list.current;
@@ -128,7 +128,7 @@ export default function RoomMessages({ roomId, socket, currentUserId }) {
           <MessageItem key={message._id} message={message} currentUserId={currentUserId} />
         ))}
       </ol>
-      {hasNewMessages && <button type="button" onClick={showLatest}>New messages — jump to latest</button>}
+      {hasNewMessages && <button className="jump-latest" type="button" onClick={showLatest}>New messages — jump to latest</button>}
       <MessageForm roomId={roomId} socket={socket}
         onSend={(message) => {
           seen.current.add(message._id);
