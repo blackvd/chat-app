@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import './LoginForm.css';
 import './ChatRoomList.css';
 
@@ -13,6 +14,24 @@ export default function ChatRoomList() {
   const [error, setError] = useState('');
   const [needsLogin, setNeedsLogin] = useState(false);
   const [actions, setActions] = useState({});
+  const [presence, setPresence] = useState({});
+  const [presenceStatus, setPresenceStatus] = useState('Connecting to live updates…');
+
+  useEffect(() => {
+    const socket = io({ withCredentials: true });
+    socket.on('rooms:presence', (snapshot) => {
+      setPresence(snapshot);
+      setPresenceStatus('');
+    });
+    const unavailable = () => {
+      setPresence({});
+      setPresenceStatus('Live user lists are unavailable. Reconnecting…');
+    };
+    socket.on('disconnect', unavailable);
+    socket.on('connect_error', unavailable);
+    socket.on('rooms:presence-error', unavailable);
+    return () => socket.disconnect();
+  }, []);
   const requests = useRef(new Map());
   const busy = Object.values(actions).some((action) => action.pending);
 
@@ -100,6 +119,7 @@ export default function ChatRoomList() {
   return (
     <section className="login-card room-list" aria-labelledby="rooms-title">
       <h1 id="rooms-title">Available chat rooms</h1>
+      {presenceStatus && <p role="status">{presenceStatus}</p>}
       <Link className="auth-link" to="/chatRooms/new">Create a chat room</Link>
       <div aria-busy={loading}>
         {loading && <p role="status">Loading chat rooms…</p>}
@@ -115,6 +135,14 @@ export default function ChatRoomList() {
                   {actions[room._id]?.pending ? (room.isMember ? 'Leaving…' : 'Joining…') : (room.isMember ? 'Leave' : 'Join')}
                 </button>
               </div>
+              {!presenceStatus && <div aria-live="polite">
+                <p>Online members: {(presence[room._id] || []).length}</p>
+                {(presence[room._id] || []).length > 0
+                  ? <ul aria-label={`Online members in ${room.name}`}>
+                    {presence[room._id].map((user) => <li key={user.id}>{user.username}</li>)}
+                  </ul>
+                  : <p>No members online.</p>}
+              </div>}
               {actions[room._id]?.error && <p className="login-error" role="alert">{actions[room._id].error}</p>}
               {actions[room._id]?.message && <p role="status">{actions[room._id].message}</p>}
             </li>

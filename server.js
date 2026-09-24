@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('node:path');
 const mongoose = require('mongoose');
+const { createServer } = require('node:http');
+const { attachPresence } = require('./lib/presence');
 const authRoutes = require('./routes/auth');
 const chatRoomRoutes = require('./routes/chatRooms');
 
@@ -17,6 +19,12 @@ app.disable('x-powered-by');
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/api', (req, res, next) => {
+  res.on('finish', () => {
+    if (req.method !== 'GET' && res.statusCode < 400) app.locals.refreshPresence?.();
+  });
+  next();
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/chatRooms', chatRoomRoutes);
 
@@ -61,8 +69,9 @@ async function startServer() {
   ]);
   console.log('Connected to MongoDB');
 
-  const server = app.listen(port, (err) => {
-    if (err) return;
+  const server = createServer(app);
+  attachPresence(server, app);
+  server.listen(port, () => {
     console.log(`Server listening on port ${server.address().port}`);
   });
 
