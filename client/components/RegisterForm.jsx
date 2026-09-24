@@ -1,7 +1,8 @@
 import React, { useId, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './LoginForm.css';
 
-export default function RegisterForm({ onRegister, onShowLogin }) {
+export default function RegisterForm({ onRegister }) {
   const id = useId();
   const submitting = useRef(false);
   const [username, setUsername] = useState('');
@@ -60,7 +61,7 @@ export default function RegisterForm({ onRegister, onShowLogin }) {
     return (
       <section className="login-card">
         <p role="status">Your account is ready, {user.username}! Log in to continue.</p>
-        {onShowLogin && <button type="button" onClick={onShowLogin}>Go to login</button>}
+        <Link className="auth-link" to="/login">Go to login</Link>
       </section>
     );
   }
@@ -95,7 +96,7 @@ export default function RegisterForm({ onRegister, onShowLogin }) {
         {error && <p className="login-error" id={`${id}-error`} role="alert">{error}</p>}
         <button type="submit" disabled={pending}>{pending ? 'Creating account…' : 'Create account'}</button>
       </form>
-      {onShowLogin && <button type="button" onClick={onShowLogin} disabled={pending}>Already have an account? Log in</button>}
+      {!pending && <Link className="auth-link" to="/login">Already have an account? Log in</Link>}
     </section>
   );
 }

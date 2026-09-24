@@ -9,3 +9,4 @@
 .login-card :focus-visible { outline: 3px solid #4069ed; outline-offset: 3px; }
 .login-card :disabled { opacity: .65; cursor: wait; }
 .login-card .login-error { margin: .25rem 0; color: #a4161a; }
+.login-card .auth-link { display: inline-block; margin-top: 1rem; color: #244ad0; }

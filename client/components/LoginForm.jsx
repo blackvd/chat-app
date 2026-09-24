@@ -1,7 +1,8 @@
 import React, { useId, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './LoginForm.css';
 
-export default function LoginForm({ onLogin, onShowRegister }) {
+export default function LoginForm({ onLogin }) {
   const id = useId();
   const submitting = useRef(false);
   const [email, setEmail] = useState('');
@@ -70,7 +71,7 @@ export default function LoginForm({ onLogin, onShowRegister }) {
         {error && <p className="login-error" id={`${id}-error`} role="alert">{error}</p>}
         <button type="submit" disabled={pending}>{pending ? 'Logging in…' : 'Log in'}</button>
       </form>
-      {onShowRegister && <button type="button" onClick={onShowRegister} disabled={pending}>Create an account</button>}
+      {!pending && <Link className="auth-link" to="/register">Create an account</Link>}
     </section>
   );
 }

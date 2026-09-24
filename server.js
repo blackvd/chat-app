@@ -22,6 +22,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+app.get(['/login', '/register'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });
 });
