@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import MessageForm from './MessageForm';
 
 function mergeMessages(current, incoming) {
@@ -14,6 +14,30 @@ export default function RoomMessages({ roomId, socket }) {
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
   const request = useRef(null);
+  const list = useRef(null);
+  const followLatest = useRef(true);
+  const previousPosition = useRef(null);
+  const seen = useRef(new Set());
+  const [hasNewMessages, setHasNewMessages] = useState(false);
+  const [connected, setConnected] = useState(!!socket?.connected);
+
+  function showLatest() {
+    followLatest.current = true;
+    setHasNewMessages(false);
+    if (list.current) list.current.scrollTop = list.current.scrollHeight;
+  }
+
+  useLayoutEffect(() => {
+    const element = list.current;
+    if (!element) return;
+    if (previousPosition.current) {
+      const { height, top } = previousPosition.current;
+      element.scrollTop = top + element.scrollHeight - height;
+      previousPosition.current = null;
+    } else if (followLatest.current) {
+      element.scrollTop = element.scrollHeight;
+    }
+  }, [messages]);
 
   async function loadHistory(cursor) {
     request.current?.abort();
@@ -34,6 +58,11 @@ export default function RoomMessages({ roomId, socket }) {
         message && typeof message._id === 'string' && message.chatRoom === roomId && typeof message.content === 'string')) {
         throw new Error('Unexpected message history response.');
       }
+      if (cursor && list.current) {
+        previousPosition.current = { height: list.current.scrollHeight, top: list.current.scrollTop };
+        followLatest.current = false;
+      }
+      data.messages.forEach((message) => seen.current.add(message._id));
       setMessages((current) => mergeMessages(current, data.messages));
       setBefore(data.nextBefore || null);
     } catch (err) {
@@ -47,10 +76,17 @@ export default function RoomMessages({ roomId, socket }) {
   useEffect(() => {
     const receive = (message) => {
       if (message?.chatRoom === roomId && typeof message._id === 'string' && typeof message.content === 'string') {
+        if (!seen.current.has(message._id) && !followLatest.current) setHasNewMessages(true);
+        seen.current.add(message._id);
         setMessages((current) => mergeMessages(current, [message]));
       }
     };
     const reload = () => {
+      setConnected(!!socket?.connected);
+      followLatest.current = true;
+      previousPosition.current = null;
+      seen.current.clear();
+      setHasNewMessages(false);
       setMessages([]);
       setBefore(null);
       loadHistory();
@@ -58,24 +94,35 @@ export default function RoomMessages({ roomId, socket }) {
     // Listen first so messages arriving during the history request are retained.
     socket?.on('message:new', receive);
     socket?.on('connect', reload);
+    const disconnected = () => setConnected(false);
+    socket?.on('disconnect', disconnected);
+    socket?.on('connect_error', disconnected);
     reload();
     return () => {
       request.current?.abort();
       socket?.off('message:new', receive);
       socket?.off('connect', reload);
+      socket?.off('disconnect', disconnected);
+      socket?.off('connect_error', disconnected);
     };
   }, [roomId, socket, retry]);
 
   return (
     <section className="room-messages" aria-label="Room messages">
       <h2>Messages</h2>
+      <p role="status">{connected ? 'Live messages connected' : 'Live messages disconnected. History is shown below.'}</p>
       {before && <button type="button" disabled={loading} onClick={() => loadHistory(before)}>Load older messages</button>}
       {loading && <p role="status">Loading messages…</p>}
       {error && <div><p className="login-error" role="alert">{error}</p>
         <button type="button" disabled={loading} onClick={() => setRetry((value) => value + 1)}>Reload messages</button>
       </div>}
       {!loading && !error && messages.length === 0 && <p>No messages yet. Start the conversation!</p>}
-      <ol className="message-list" role="log" aria-label="Message history" aria-live="polite" tabIndex={0}>
+      <ol ref={list} className="message-list" role="log" aria-label="Message history" aria-live="polite" tabIndex={0}
+        onScroll={() => {
+          const element = list.current;
+          followLatest.current = element.scrollHeight - element.scrollTop - element.clientHeight < 48;
+          if (followLatest.current) setHasNewMessages(false);
+        }}>
         {messages.map((message) => (
           <li key={message._id}>
             <strong>{message.sender?.username || 'Deleted user'}</strong>
@@ -84,8 +131,13 @@ export default function RoomMessages({ roomId, socket }) {
           </li>
         ))}
       </ol>
+      {hasNewMessages && <button type="button" onClick={showLatest}>New messages — jump to latest</button>}
       <MessageForm roomId={roomId} socket={socket}
-        onSend={(message) => setMessages((current) => mergeMessages(current, [message]))} />
+        onSend={(message) => {
+          seen.current.add(message._id);
+          showLatest();
+          setMessages((current) => mergeMessages(current, [message]));
+        }} />
     </section>
   );
 }
