@@ -1,0 +1,35 @@
+# Frontend on Netlify; API and Socket.io are proxied to the backend so the browser
+# sees a single origin and the session cookie keeps working.
+# Replace YOUR-BACKEND.onrender.com with your Render service URL (3 places below).
+
+[build]
+  command = "npm run build"
+  publish = "public"
+
+[build.environment]
+  NODE_VERSION = "22"
+  VITE_SOCKET_POLLING_ONLY = "true"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://YOUR-BACKEND.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/socket.io/*"
+  to = "https://YOUR-BACKEND.onrender.com/socket.io/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/health"
+  to = "https://YOUR-BACKEND.onrender.com/health"
+  status = 200
+  force = true
+
+# Client-side routes (/login, /chatRooms, …) fall back to the React app.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

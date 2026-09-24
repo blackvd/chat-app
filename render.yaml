@@ -1,0 +1,16 @@
+# Backend (Express + Socket.io) for NouchiChat. The Netlify frontend proxies to this service.
+services:
+  - type: web
+    name: nouchichat-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: MONGODB_URI
+        sync: false

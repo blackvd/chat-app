@@ -53,7 +53,9 @@ export default function ChatRoomList() {
   }
 
   useEffect(() => {
-    const socket = io({ withCredentials: true });
+    // Netlify's proxy does not forward WebSockets, so Netlify builds stay on HTTP long-polling.
+    const socket = io({ withCredentials: true,
+      ...(import.meta.env.VITE_SOCKET_POLLING_ONLY === 'true' && { transports: ['polling'] }) });
     setMessageSocket(socket);
     socket.on('session:user', (user) => setCurrentUserId(user.id));
     socket.on('rooms:presence', (snapshot) => {

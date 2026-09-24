@@ -72,7 +72,8 @@ async function startServer() {
   console.log('Connected to MongoDB');
 
   const server = createServer(app);
-  const io = new Server(server);
+  // A shorter ping keeps long-polling requests well under proxy timeouts (e.g. Netlify).
+  const io = new Server(server, { pingInterval: 10000 });
   app.locals.io = io;
   attachPresence(io, app);
 
