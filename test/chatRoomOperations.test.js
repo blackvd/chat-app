@@ -22,15 +22,15 @@ test('list pagination is bounded and excludes member arrays', async (t) => {
     sort(value) { assert.deepEqual(value, { _id: -1 }); return this; },
     skip(value) { assert.equal(value, 20); return this; },
     limit(value) { assert.equal(value, 20); return this; },
-    select(value) { assert.equal(value, 'name createdBy createdAt updatedAt'); return this; },
-    async lean() { return [{ name: 'General' }]; },
+    select(value) { assert.equal(value, 'name createdBy createdAt updatedAt members'); return this; },
+    async lean() { return [{ name: 'General', members: ['owner'] }, { name: 'Other', members: ['someone'] }]; },
   };
   t.mock.method(ChatRoom, 'find', () => query);
   for (const query of [{ page: '0' }, { limit: '101' }, { page: {} }, { page: 'Infinity' }]) {
     assert.equal((await request('get', '/', { query })).statusCode, 400);
   }
   assert.deepEqual((await request('get', '/', { query: { page: '2' } })).body,
-    { rooms: [{ name: 'General' }], page: 2, limit: 20 });
+    { rooms: [{ name: 'General', isMember: true }, { name: 'Other', isMember: false }], page: 2, limit: 20 });
 });
 
 test('room details and owner-only changes', async (t) => {

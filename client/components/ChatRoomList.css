@@ -3,3 +3,6 @@
 .room-list li { padding: 1rem 0; border-bottom: 1px solid #dbe2ea; overflow-wrap: anywhere; }
 .room-list-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: 1rem; }
 .room-list-actions button { margin-top: 0; }
+.room-membership { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.room-membership span { min-width: 0; }
+.room-membership button { flex-shrink: 0; margin: 0; }

@@ -21,8 +21,14 @@ router.get('/', async (req, res) => {
   }
   const rooms = await ChatRoom.find({}).sort({ _id: -1 })
     .skip((Number(page) - 1) * Number(limit)).limit(Number(limit))
-    .select('name createdBy createdAt updatedAt').lean();
-  res.json({ rooms, page: Number(page), limit: Number(limit) });
+    .select('name createdBy createdAt updatedAt members').lean();
+  res.json({
+    rooms: rooms.map(({ members, ...room }) => ({
+      ...room,
+      isMember: members.some((member) => String(member) === String(req.userId)),
+    })),
+    page: Number(page), limit: Number(limit),
+  });
 });
 
 router.post('/', async (req, res) => {
