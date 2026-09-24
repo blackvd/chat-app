@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('node:path');
 const mongoose = require('mongoose');
+const authRoutes = require('./routes/auth');
 
 try {
   process.loadEnvFile(path.join(__dirname, '.env'));
@@ -15,6 +16,7 @@ app.disable('x-powered-by');
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/api/auth', authRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
