@@ -4,7 +4,8 @@ services:
     name: nouchichat-api
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build
+    # NODE_ENV=production makes npm skip devDependencies; Vite is one and is needed to build.
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /health
     envVars:
