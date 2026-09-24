@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import MessageForm from './MessageForm';
+import MessageItem from './MessageItem';
 
 function mergeMessages(current, incoming) {
   const messages = new Map(current.map((message) => [message._id, message]));
@@ -7,7 +8,7 @@ function mergeMessages(current, incoming) {
   return [...messages.values()].sort((a, b) => a._id.localeCompare(b._id));
 }
 
-export default function RoomMessages({ roomId, socket }) {
+export default function RoomMessages({ roomId, socket, currentUserId }) {
   const [messages, setMessages] = useState([]);
   const [before, setBefore] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -124,11 +125,7 @@ export default function RoomMessages({ roomId, socket }) {
           if (followLatest.current) setHasNewMessages(false);
         }}>
         {messages.map((message) => (
-          <li key={message._id}>
-            <strong>{message.sender?.username || 'Deleted user'}</strong>
-            {message.createdAt && <time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString()}</time>}
-            <p>{message.content}</p>
-          </li>
+          <MessageItem key={message._id} message={message} currentUserId={currentUserId} />
         ))}
       </ol>
       {hasNewMessages && <button type="button" onClick={showLatest}>New messages — jump to latest</button>}

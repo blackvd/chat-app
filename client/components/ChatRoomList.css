@@ -12,3 +12,12 @@
 .message-list { max-height: 22rem; overflow-y: auto; list-style: none; padding: 0; }
 .message-list time { display: block; font-size: .8rem; color: #526174; }
 .message-list p { white-space: pre-wrap; overflow-wrap: anywhere; margin: .5rem 0; }
+.message-list .chat-message { display: flex; align-items: flex-start; gap: .6rem; border: 0; padding: .6rem .2rem; }
+.message-avatar { display: grid; place-items: center; flex: 0 0 2rem; height: 2rem; border-radius: 50%; background: #dbe2ea; color: #243650; font-size: .8rem; font-weight: 700; }
+.message-bubble { min-width: 0; max-width: 85%; padding: .75rem; border-radius: .75rem; background: #f0f3f7; }
+.message-header { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .75rem; }
+.message-list .chat-message-own { flex-direction: row-reverse; }
+.chat-message-own .message-bubble { background: #e5edff; }
+.chat-message-own .message-avatar { background: #244ad0; color: white; }
+.message-you { color: #244ad0; }
+.message-time-missing { font-size: .8rem; color: #526174; }

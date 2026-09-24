@@ -16,12 +16,14 @@ export default function ChatRoomList() {
   const [needsLogin, setNeedsLogin] = useState(false);
   const [actions, setActions] = useState({});
   const [messageSocket, setMessageSocket] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [presence, setPresence] = useState({});
   const [presenceStatus, setPresenceStatus] = useState('Connecting to live updates…');
 
   useEffect(() => {
     const socket = io({ withCredentials: true });
     setMessageSocket(socket);
+    socket.on('session:user', (user) => setCurrentUserId(user.id));
     socket.on('rooms:presence', (snapshot) => {
       setPresence(snapshot);
       setPresenceStatus('');
@@ -148,7 +150,7 @@ export default function ChatRoomList() {
               </div>}
               {actions[room._id]?.error && <p className="login-error" role="alert">{actions[room._id].error}</p>}
               {actions[room._id]?.message && <p role="status">{actions[room._id].message}</p>}
-              {room.isMember && <RoomMessages roomId={room._id} socket={messageSocket} />}
+              {room.isMember && <RoomMessages roomId={room._id} socket={messageSocket} currentUserId={currentUserId} />}
             </li>
           ))}</ul>
         ) : <p role="status">{page === 1 ? 'No chat rooms yet. Create the first one!' : 'No more chat rooms on this page.'}</p>)}
