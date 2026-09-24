@@ -5,7 +5,7 @@ export default function ChatRoomCard({
   room, action, needsLogin, onMembershipChange, onlineUsers, presenceStatus, socket, currentUserId,
 }) {
   return (
-    <li aria-busy={!!action?.pending}>
+    <li className="room-card" aria-busy={!!action?.pending}>
       <div className="room-membership">
         <span>{room.name}{room.isMember && <small> · Joined</small>}</span>
         <button type="button" disabled={needsLogin || !!action?.pending}

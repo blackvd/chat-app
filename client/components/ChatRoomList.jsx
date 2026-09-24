@@ -130,7 +130,7 @@ export default function ChatRoomList() {
         {loading && <p role="status">Loading chat rooms…</p>}
         {!loading && error && <p className="login-error" role="alert">{error}</p>}
         {!loading && !error && (rooms.length ? (
-          <ul>{rooms.map((room) => (
+          <ul className="room-cards">{rooms.map((room) => (
             <ChatRoomCard key={room._id} room={room} action={actions[room._id]}
               needsLogin={needsLogin} onMembershipChange={() => changeMembership(room)}
               onlineUsers={presence[room._id] || []} presenceStatus={presenceStatus}

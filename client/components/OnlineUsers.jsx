@@ -3,7 +3,7 @@ import React from 'react';
 export default function OnlineUsers({ users = [], roomName, status }) {
   if (status) return <p role="status">{status}</p>;
   return (
-    <div aria-live="polite">
+    <div className="online-users" aria-live="polite">
       <p>Online members: {users.length}</p>
       {users.length ? (
         <ul aria-label={`Online members in ${roomName}`}>
