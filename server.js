@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('node:path');
 const mongoose = require('mongoose');
 const { createServer } = require('node:http');
+const { Server } = require('socket.io');
 const { attachPresence } = require('./lib/presence');
 const authRoutes = require('./routes/auth');
 const chatRoomRoutes = require('./routes/chatRooms');
@@ -70,7 +71,28 @@ async function startServer() {
   console.log('Connected to MongoDB');
 
   const server = createServer(app);
-  attachPresence(server, app);
+  const io = new Server(server);
+  app.locals.io = io;
+  attachPresence(io, app);
+
+  let shuttingDown = false;
+  async function shutdown() {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    process.removeListener('SIGINT', handleShutdown);
+    process.removeListener('SIGTERM', handleShutdown);
+    await new Promise((resolve) => io.close(resolve));
+    delete app.locals.io;
+    await mongoose.disconnect();
+  }
+  const handleShutdown = () => {
+    shutdown().catch((err) => {
+      console.error('Failed to shut down server:', err.name);
+      process.exitCode = 1;
+    });
+  };
+  process.once('SIGINT', handleShutdown);
+  process.once('SIGTERM', handleShutdown);
   server.listen(port, () => {
     console.log(`Server listening on port ${server.address().port}`);
   });
@@ -78,7 +100,7 @@ async function startServer() {
   server.on('error', async (err) => {
     console.error('Failed to start server:', err.message);
     process.exitCode = 1;
-    await mongoose.disconnect();
+    await shutdown();
   });
 }
 
