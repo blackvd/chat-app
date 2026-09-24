@@ -1,0 +1,5 @@
+.room-list { width: min(100%, 40rem); }
+.room-list ul { list-style: none; padding: 0; margin: 1.5rem 0; }
+.room-list li { padding: 1rem 0; border-bottom: 1px solid #dbe2ea; overflow-wrap: anywhere; }
+.room-list-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: 1rem; }
+.room-list-actions button { margin-top: 0; }

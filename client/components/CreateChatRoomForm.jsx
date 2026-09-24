@@ -59,6 +59,7 @@ export default function CreateChatRoomForm({ onCreate }) {
         <h1>Room created</h1>
         <p role="status">You created “{room.name}” and joined as its first member.</p>
         <button type="button" onClick={() => setRoom(null)}>Create another room</button>
+        <Link className="auth-link" to="/chatRooms">Browse chat rooms</Link>
       </section>
     );
   }
@@ -76,6 +77,7 @@ export default function CreateChatRoomForm({ onCreate }) {
         <button type="submit" disabled={pending}>{pending ? 'Creating room…' : 'Create room'}</button>
       </form>
       {needsLogin && <Link className="auth-link" to="/login">Log in</Link>}
+      <Link className="auth-link" to="/chatRooms">Back to chat rooms</Link>
     </section>
   );
 }

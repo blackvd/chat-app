@@ -24,7 +24,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.get(['/login', '/register', '/chatRooms/new'], (req, res) => {
+app.get(['/login', '/register', '/chatRooms/new', '/chatRooms'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 

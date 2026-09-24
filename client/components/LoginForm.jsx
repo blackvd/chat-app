@@ -52,7 +52,7 @@ export default function LoginForm({ onLogin }) {
     return (
       <section className="login-card">
         <p role="status">Welcome, {user.username}! You are logged in.</p>
-        <Link className="auth-link" to="/chatRooms/new">Create a chat room</Link>
+        <Link className="auth-link" to="/chatRooms">Browse chat rooms</Link>
       </section>
     );
   }
