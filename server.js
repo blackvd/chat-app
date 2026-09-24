@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('node:path');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
+const chatRoomRoutes = require('./routes/chatRooms');
 
 try {
   process.loadEnvFile(path.join(__dirname, '.env'));
@@ -17,6 +18,7 @@ app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
+app.use('/api/chatRooms', chatRoomRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
