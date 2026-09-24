@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import MessageForm from './MessageForm';
 import './LoginForm.css';
 import './ChatRoomList.css';
 
@@ -14,11 +15,13 @@ export default function ChatRoomList() {
   const [error, setError] = useState('');
   const [needsLogin, setNeedsLogin] = useState(false);
   const [actions, setActions] = useState({});
+  const [messageSocket, setMessageSocket] = useState(null);
   const [presence, setPresence] = useState({});
   const [presenceStatus, setPresenceStatus] = useState('Connecting to live updates…');
 
   useEffect(() => {
     const socket = io({ withCredentials: true });
+    setMessageSocket(socket);
     socket.on('rooms:presence', (snapshot) => {
       setPresence(snapshot);
       setPresenceStatus('');
@@ -145,6 +148,7 @@ export default function ChatRoomList() {
               </div>}
               {actions[room._id]?.error && <p className="login-error" role="alert">{actions[room._id].error}</p>}
               {actions[room._id]?.message && <p role="status">{actions[room._id].message}</p>}
+              {room.isMember && <MessageForm roomId={room._id} socket={messageSocket} />}
             </li>
           ))}</ul>
         ) : <p role="status">{page === 1 ? 'No chat rooms yet. Create the first one!' : 'No more chat rooms on this page.'}</p>)}
