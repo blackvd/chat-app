@@ -49,6 +49,10 @@ async function startServer() {
   await mongoose.connect(process.env.MONGODB_URI, {
     serverSelectionTimeoutMS: 10000,
   });
+  await Promise.all([
+    require('./models/User').init(),
+    require('./models/Session').init(),
+  ]);
   console.log('Connected to MongoDB');
 
   const server = app.listen(port, (err) => {
