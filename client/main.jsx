@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
+import CreateChatRoomForm from './components/CreateChatRoomForm';
 import './style.css';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
+        <Route path="/chatRooms/new" element={<CreateChatRoomForm />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </main>
