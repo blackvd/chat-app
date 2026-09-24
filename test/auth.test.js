@@ -32,6 +32,10 @@ test('registration, login, and logout lifecycle', async (t) => {
   const input = { username: 'Alice', email: 'Alice@Example.com', password: 'test-password-123' };
 
   assert.equal((await post('register', { ...input, password: 'short' })).status, 400);
+  for (const password of ['a'.repeat(73), 'é'.repeat(37)]) {
+    assert.equal((await post('register', { ...input, password })).status, 400);
+    assert.equal((await post('login', { ...input, password })).status, 400);
+  }
   assert.equal((await post('login', { email: { $ne: null }, password: input.password })).status, 400);
   const registered = await post('register', input);
   assert.equal(registered.status, 201);
@@ -39,6 +43,7 @@ test('registration, login, and logout lifecycle', async (t) => {
     user: { id: 'test-user', username: 'Alice', email: 'alice@example.com' },
   });
   assert.notEqual(user.passwordHash, input.password);
+  assert.match(user.passwordHash, /^\$2b\$12\$/);
   assert.equal((await post('register', input)).status, 409);
   assert.equal((await post('login', { ...input, password: 'wrong-password' })).status, 401);
   assert.equal((await post('login', { ...input, email: 'missing@example.com' })).status, 401);

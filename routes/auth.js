@@ -32,7 +32,7 @@ function credentials(body) {
   if (typeof email !== 'string' || typeof password !== 'string') return null;
   const normalizedEmail = email.trim().toLowerCase();
   if (normalizedEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)
-      || password.length < 8 || password.length > 128) return null;
+      || password.length < 8 || Buffer.byteLength(password, 'utf8') > 72) return null;
   return { email: normalizedEmail, password };
 }
 
@@ -40,7 +40,7 @@ router.post('/register', async (req, res) => {
   const input = credentials(req.body);
   const username = typeof req.body?.username === 'string' ? req.body.username.trim() : '';
   if (!input || username.length < 2 || username.length > 50) {
-    return res.status(400).json({ error: 'Provide a username (2–50 characters), valid email, and password (8–128 characters).' });
+    return res.status(400).json({ error: 'Provide a username (2–50 characters), valid email, and password (at least 8 characters, at most 72 UTF-8 bytes).' });
   }
 
   try {
@@ -60,7 +60,7 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   const input = credentials(req.body);
-  if (!input) return res.status(400).json({ error: 'Provide a valid email and password (8–128 characters).' });
+  if (!input) return res.status(400).json({ error: 'Provide a valid email and password (at least 8 characters, at most 72 UTF-8 bytes).' });
 
   const user = await User.findOne({ email: input.email }).select('+passwordHash');
   if (!user || !await verifyPassword(input.password, user.passwordHash)) {
