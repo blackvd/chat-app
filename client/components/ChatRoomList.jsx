@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import RoomMessages from './RoomMessages';
+import ChatRoomCard from './ChatRoomCard';
 import './LoginForm.css';
 import './ChatRoomList.css';
 
@@ -131,27 +131,10 @@ export default function ChatRoomList() {
         {!loading && error && <p className="login-error" role="alert">{error}</p>}
         {!loading && !error && (rooms.length ? (
           <ul>{rooms.map((room) => (
-            <li key={room._id} aria-busy={!!actions[room._id]?.pending}>
-              <div className="room-membership">
-                <span>{room.name}{room.isMember && <small> · Joined</small>}</span>
-                <button type="button" disabled={needsLogin || !!actions[room._id]?.pending}
-                  aria-label={`${room.isMember ? 'Leave' : 'Join'} ${room.name}`}
-                  onClick={() => changeMembership(room)}>
-                  {actions[room._id]?.pending ? (room.isMember ? 'Leaving…' : 'Joining…') : (room.isMember ? 'Leave' : 'Join')}
-                </button>
-              </div>
-              {!presenceStatus && <div aria-live="polite">
-                <p>Online members: {(presence[room._id] || []).length}</p>
-                {(presence[room._id] || []).length > 0
-                  ? <ul aria-label={`Online members in ${room.name}`}>
-                    {presence[room._id].map((user) => <li key={user.id}>{user.username}</li>)}
-                  </ul>
-                  : <p>No members online.</p>}
-              </div>}
-              {actions[room._id]?.error && <p className="login-error" role="alert">{actions[room._id].error}</p>}
-              {actions[room._id]?.message && <p role="status">{actions[room._id].message}</p>}
-              {room.isMember && <RoomMessages roomId={room._id} socket={messageSocket} currentUserId={currentUserId} />}
-            </li>
+            <ChatRoomCard key={room._id} room={room} action={actions[room._id]}
+              needsLogin={needsLogin} onMembershipChange={() => changeMembership(room)}
+              onlineUsers={presence[room._id] || []} presenceStatus={presenceStatus}
+              socket={messageSocket} currentUserId={currentUserId} />
           ))}</ul>
         ) : <p role="status">{page === 1 ? 'No chat rooms yet. Create the first one!' : 'No more chat rooms on this page.'}</p>)}
       </div>
