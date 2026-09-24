@@ -67,6 +67,7 @@ async function startServer() {
   await Promise.all([
     require('./models/User').init(),
     require('./models/Session').init(),
+    require('./models/Message').init(),
   ]);
   console.log('Connected to MongoDB');
 

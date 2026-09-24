@@ -8,5 +8,6 @@ const messageSchema = new mongoose.Schema({
 
 // Support fetching a room's message history in chronological order.
 messageSchema.index({ chatRoom: 1, createdAt: -1, _id: -1 });
+messageSchema.index({ chatRoom: 1, _id: -1 });
 
 module.exports = mongoose.model('Message', messageSchema);
