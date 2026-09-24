@@ -8,3 +8,7 @@
 .room-membership button { flex-shrink: 0; margin: 0; }
 .message-form { margin-top: 1rem; }
 .message-form textarea { width: 100%; resize: vertical; padding: .75rem; border: 1px solid #8895a7; border-radius: .5rem; font: inherit; }
+.room-messages h2 { font-size: 1rem; margin-top: 1.5rem; }
+.message-list { max-height: 22rem; overflow-y: auto; list-style: none; padding: 0; }
+.message-list time { display: block; font-size: .8rem; color: #526174; }
+.message-list p { white-space: pre-wrap; overflow-wrap: anywhere; margin: .5rem 0; }

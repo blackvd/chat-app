@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import MessageForm from './MessageForm';
+import RoomMessages from './RoomMessages';
 import './LoginForm.css';
 import './ChatRoomList.css';
 
@@ -148,7 +148,7 @@ export default function ChatRoomList() {
               </div>}
               {actions[room._id]?.error && <p className="login-error" role="alert">{actions[room._id].error}</p>}
               {actions[room._id]?.message && <p role="status">{actions[room._id].message}</p>}
-              {room.isMember && <MessageForm roomId={room._id} socket={messageSocket} />}
+              {room.isMember && <RoomMessages roomId={room._id} socket={messageSocket} />}
             </li>
           ))}</ul>
         ) : <p role="status">{page === 1 ? 'No chat rooms yet. Create the first one!' : 'No more chat rooms on this page.'}</p>)}
